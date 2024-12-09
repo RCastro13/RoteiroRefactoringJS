@@ -50,7 +50,7 @@ function gerarFaturaStr (fatura, pecas) {
       let total = calcularTotalApresentacao(apre);
   
       // créditos para próximas contratações
-      creditos = calcularCredito(apre);
+      creditos += calcularCredito(apre);
 
       // mais uma linha da fatura
       faturaStr += `  ${getPeca(apre).nome}: ${formatarMoeda(total/100)} (${apre.audiencia} assentos)\n`;
