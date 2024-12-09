@@ -5,12 +5,24 @@ function gerarFaturaStr (fatura, pecas) {
     function getPeca(apresentacao) {
       return pecas[apresentacao.id];
     }
+
+    function calcularCredito(apre) {
+      let creditos = 0;
+      creditos += Math.max(apre.audiencia - 30, 0);
+      if (getPeca(apre).tipo === "comedia") 
+         creditos += Math.floor(apre.audiencia / 5);
+      return creditos;   
+    }
+
+    function formatarMoeda(valor) {
+      return new Intl.NumberFormat("pt-BR",
+        { style: "currency", currency: "BRL",
+          minimumFractionDigits: 2 }).format(valor/100);
+    }
+
     let totalFatura = 0;
     let creditos = 0;
     let faturaStr = `Fatura ${fatura.cliente}\n`;
-    const formato = new Intl.NumberFormat("pt-BR",
-                          { style: "currency", currency: "BRL",
-                            minimumFractionDigits: 2 }).format;
 
     function calcularTotalApresentacao(apre) {
       let total = 0;
@@ -35,19 +47,16 @@ function gerarFaturaStr (fatura, pecas) {
     }
   
     for (let apre of fatura.apresentacoes) {
-      //const peca = getPeca(apre);
       let total = calcularTotalApresentacao(apre);
   
       // créditos para próximas contratações
-      creditos += Math.max(apre.audiencia - 30, 0);
-      if (getPeca(apre).tipo === "comedia") 
-         creditos += Math.floor(apre.audiencia / 5);
-  
+      creditos = calcularCredito(apre);
+
       // mais uma linha da fatura
-      faturaStr += `  ${getPeca(apre).nome}: ${formato(total/100)} (${apre.audiencia} assentos)\n`;
+      faturaStr += `  ${getPeca(apre).nome}: ${formatarMoeda(total/100)} (${apre.audiencia} assentos)\n`;
       totalFatura += total;
     }
-    faturaStr += `Valor total: ${formato(totalFatura/100)}\n`;
+    faturaStr += `Valor total: ${formatarMoeda(totalFatura/100)}\n`;
     faturaStr += `Créditos acumulados: ${creditos} \n`;
     return faturaStr;
   }
